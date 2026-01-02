@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>404 - 找不到页面</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f9f9ff;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+      font-family: "Segoe UI", sans-serif;
+      cursor: grab;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 2rem;
+      pointer-events: none; /* 不阻挡拖拽 */
+    }
+
+    h1 {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      color: #ff6b6b;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      pointer-events: auto;
+    }
+
+    p {
+      font-size: 1.5rem;
+      color: #555;
+      max-width: 600px;
+      line-height: 1.6;
+      pointer-events: auto;
+    }
+
+    a {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.5rem;
+      background: #4ecdc4;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+      transition: background 0.3s;
+      pointer-events: auto;
+      display: inline-block;
+    }
+
+    a:hover {
+      background: #1a535c;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 4rem; }
+      p { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Matter.js 画布 -->
+  <canvas id="canvas"></canvas>
+
+  <div class="content">
+    <h1>404</h1>
+    <p>{{.path}} not exist</p>
+    <p>哎呀！你掉进了一个充满表情包的黑洞 🕳️<br>快拖一拖它们吧！</p>
+    <a href="/">返回首页</a>
+  </div>
+
+  <!-- 引入 Matter.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script>
+    // Emoji 列表（无重复）
+    const emojis = [
+      '👾', '🤖', '👻', '👽', '🦄', '🐉', '🐙', '🦑', '🦀',
+      '🦋', '🐞', '🦂', '🐢', '🦖', '🦕', '🦧', '🦥', '🦦',
+      '🍕', '🍦', '🍩', '🍭', '🍿', '🍷', '🍺', '🌮', '🍣',
+      '⚽', '🏀', '🎯', '🎲', '🎮', '🕹️', '🎨', '🎭', '🎪',
+      '🚀', '🛸', '🚗', '🚲', '✈️', '⛵', '🚁', '🚂',
+      '🌈', '🔥', '💧', '❄️', '⚡', '✨', '🌟', '💥', '💫',
+      '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎',
+      '🙈', '🙉', '🙊', '🐶', '🐱', '🐭', '🐹', '🐰', '🦊'
+    ];
+
+    // 初始化 Matter.js
+    const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Events } = Matter;
+
+    // 创建引擎
+    const engine = Engine.create();
+    engine.world.gravity.y = 0.5; // 微弱重力，让 emoji 落地
+
+    // 创建渲染器
+    const render = Render.create({
+      canvas: document.getElementById('canvas'),
+      engine: engine,
+      options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false,
+        background: 'transparent'
+      }
+    });
+
+    // 自适应窗口大小
+    window.addEventListener('resize', () => {
+      render.options.width = window.innerWidth;
+      render.options.height = window.innerHeight;
+      render.canvas.width = window.innerWidth;
+      render.canvas.height = window.innerHeight;
+      // 更新边界墙
+      World.clear(engine.world, false);
+      createWalls();
+      placeEmojis();
+    });
+
+    // 创建边界墙（防止 emoji 飞出屏幕）
+    function createWalls() {
+      const w = render.options.width;
+      const h = render.options.height;
+      const thickness = 50;
+      World.add(engine.world, [
+        // 左右墙（不可见但有碰撞）
+        Bodies.rectangle(w / 2, -thickness / 2, w, thickness, { isStatic: true }),
+        Bodies.rectangle(w / 2, h + thickness / 2, w, thickness, { isStatic: true }),
+        Bodies.rectangle(-thickness / 2, h / 2, thickness, h, { isStatic: true }),
+        Bodies.rectangle(w + thickness / 2, h / 2, thickness, h, { isStatic: true })
+      ]);
+    }
+
+    // 创建可拖拽的 emoji
+    function createEmoji(x, y, char) {
+      const size = 30 + Math.random() * 50; // 30~80px
+      const body = Bodies.circle(x, y, size / 2, {
+        restitution: 0.8,   // 弹性
+        friction: 0.01,     // 摩擦力小，滑得远
+        frictionAir: 0.005, // 空气阻力小
+        render: {
+          sprite: {
+            texture: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='75' font-size='80' text-anchor='middle'>${encodeURIComponent(char)}</text></svg>`,
+            xScale: size / 100,
+            yScale: size / 100
+          }
+        }
+      });
+      return body;
+    }
+
+    // 初始放置 emoji（避免重叠）
+    function placeEmojis() {
+      const count = Math.min(emojis.length, 60); // 最多 60 个
+      const w = render.options.width;
+      const h = render.options.height;
+      const placed = [];
+
+      for (let i = 0; i < count; i++) {
+        let x, y;
+        let attempts = 0;
+        const radius = 40; // 最小间距
+
+        do {
+          x = radius + Math.random() * (w - 2 * radius);
+          y = radius + Math.random() * (h - 2 * radius);
+          attempts++;
+        } while (
+          attempts < 100 &&
+          placed.some(pos => Math.hypot(pos.x - x, pos.y - y) < radius)
+        );
+
+        placed.push({x, y});
+        const emojiBody = createEmoji(x, y, emojis[i]);
+        World.add(engine.world, emojiBody);
+      }
+    }
+
+    // 添加鼠标拖拽支持
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse: mouse,
+      constraint: {
+        stiffness: 0.2,
+        render: { visible: false }
+      }
+    });
+    World.add(engine.world, mouseConstraint);
+    render.mouse = mouse;
+
+    // 启动
+    createWalls();
+    placeEmojis();
+    Render.run(render);
+    Engine.run(engine);
+
+    // 提示：按住拖动试试！
+  </script>
+</body>
+</html>

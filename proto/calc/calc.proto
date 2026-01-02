@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package calc.v1;
+option go_package = "gin_test/proto;calc"; // 注意：Windows 路径分隔符不影响
+//简单计算服务demo
+service Calculator {
+  //两数相加
+  rpc Add(AddRequest) returns (AddResponse);
+  //两数相乘
+  rpc Multiply(MultiplyRequest) returns (MultiplyResponse);
+}
+
+message AddRequest {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message AddResponse {
+  int32 result = 1;
+}
+
+message MultiplyRequest {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message MultiplyResponse {
+  int32 result = 1;
+}
