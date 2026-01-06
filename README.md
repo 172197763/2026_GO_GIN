@@ -17,3 +17,9 @@ air<br>
 >安装：go install github.com/cosmtrek/air@latest<br>
 >效果：可以监听文件变化并自动重启服务<br>
 >提醒：需要配置文件：.air.toml<br>
+
+protoc<br>
+>安装：choco install protoc【windows环境】<br>
+>效果：根据.proto文件生成对应结构&操作方法<br>
+>使用：protoc --proto_path=. --go_out=. --go_opt=paths=source_relative 文件路径.proto<br>
+
