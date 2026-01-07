@@ -3,6 +3,7 @@ gin练习项目-请勿关注！！！
 ## 项目目录结构说明
 项目名称  
 ├─ api ---gin框架业务逻辑<br>
+├─ cli ---命令行<br>
 ├─ proto ---rpc服务接口定义<br>
 └─ templates ---html模板<br>
 .env.temp：系统配置信息<br>
@@ -22,4 +23,8 @@ protoc<br>
 >安装：choco install protoc【windows环境】<br>
 >效果：根据.proto文件生成对应结构&操作方法<br>
 >使用：protoc --proto_path=. --go_out=. --go_opt=paths=source_relative 文件路径.proto<br>
+
+cobra<br>
+>安装：go get -u github.com/spf13/cobra/cobra<br>
+>效果：用命令行方式执行go方法<br>
 
