@@ -14,6 +14,8 @@ var AnsCmd = &cobra.Command{
 		switch queNums {
 		case 1161:
 			Q1161()
+		case 1339:
+			Q1339()
 
 		}
 	},
