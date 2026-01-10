@@ -1,9 +1,5 @@
 package leetcode
 
-import (
-	"fmt"
-)
-
 // https://leetcode.cn/problems/maximum-product-of-splitted-binary-tree/description/?envType=daily-question&envId=2026-01-07
 
 func Q1339() {
@@ -48,44 +44,4 @@ func dfs1339(node *TreeNode) int {
 	}
 	node.Val = sum
 	return node.Val
-}
-func PrintTreeStructure(root *TreeNode) {
-	if root == nil {
-		fmt.Println("Empty tree")
-		return
-	}
-	printTreeHelper(root, "", true)
-}
-
-func printTreeHelper(node *TreeNode, prefix string, isLast bool) {
-	if node != nil {
-		fmt.Print(prefix)
-		if isLast {
-			fmt.Print("└── ")
-			prefix += "    "
-		} else {
-			fmt.Print("├── ")
-			prefix += "│   "
-		}
-		fmt.Println(node.Val)
-
-		// 计算子节点数量
-		children := 0
-		if node.Left != nil {
-			children++
-		}
-		if node.Right != nil {
-			children++
-		}
-
-		// 递归打印左子树
-		if node.Left != nil {
-			printTreeHelper(node.Left, prefix, children == 1 && node.Right == nil)
-		}
-
-		// 递归打印右子树
-		if node.Right != nil {
-			printTreeHelper(node.Right, prefix, true)
-		}
-	}
 }

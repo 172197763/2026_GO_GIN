@@ -6,11 +6,6 @@ import (
 )
 
 // https://leetcode.cn/problems/maximum-level-sum-of-a-binary-tree/?envType=daily-question&envId=2026-01-06
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-}
 
 func Q1161() {
 	root := &TreeNode{989, nil, nil}
