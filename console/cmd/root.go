@@ -17,5 +17,6 @@ var RootCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(demoCmd)
+	RootCmd.AddCommand(timeCmd)
 	RootCmd.AddCommand(leetcode.AnsCmd)
 }
