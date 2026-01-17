@@ -91,6 +91,9 @@ docker-compose logs -f mosquitto
 mosquitto  | 1705400000: Opening ipv4 listen socket on port 1883.
 mosquitto  | 1705400000: Opening ipv6 listen socket on port 1883.
 mosquitto  | 1705400000: Opening websockets listen socket on port 9001.
+# 在yml文件目录下使用docker compose ps查看
+mosquitto-mosquitto-1   eclipse-mosquitto:latest   "/docker-entrypoint.…"   mosquitto   47 minutes ago   Up 47 minutes   0.0.0.0:1883->1883/tcp, [::]:1883->1883/tcp, 0.0.0.0:9001->9001/tcp, [::]:9001->9001/tcp
+
 
 ```
 6. 提示没有docker-compose 命令则需单独安装
