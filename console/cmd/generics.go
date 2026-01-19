@@ -20,25 +20,44 @@ var GenericsCmd = &cobra.Command{
 type Number interface {
 	~int | ~float64
 }
+type Person struct {
+	Name    string
+	Age     int
+	UseTool bool
+}
+type Animal struct {
+	Name string
+	Age  int
+}
+type Resp[T any] struct {
+	Code int `json:"code"`
+	Data T   `json:"data"`
+}
 
 /**
  * @description:comparable 是 Go 1.18 引入的一个预定义标识符，它表示可以使用 == 和 != 运算符进行比较的类型，包括所有基本类型（如 int, float64, string 等）和某些复合类型（如数组、结构体等，但不包括切片、映射和函数）
  */
 func handle() {
-	type Person struct {
-		Name string
-		Age  int
-	}
 	var persons = []Person{
-		{"张三", 18},
-		{"李四", 19},
-		{"王五", 20},
+		{"张三", 18, true},
+		{"李四", 19, true},
+		{"王五", 20, true},
 	}
 	persons = Filter(persons, func(v any) bool {
 		person := v.(Person)
 		return person.Age >= 19
 	})
 	fmt.Println(persons)
+	response()
+}
+func response() {
+	p := Person{Name: "张三", Age: 18, UseTool: true}
+	a := Animal{Name: "小黄", Age: 1}
+	r1 := Resp[Person]{Data: p}
+	a1 := Resp[Animal]{Data: a}
+	//可直接调用data中的属性
+	fmt.Println(r1.Data.UseTool)
+	fmt.Println(a1.Data.Name)
 }
 
 /**
