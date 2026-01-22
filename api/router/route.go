@@ -10,6 +10,7 @@ import (
 func Init(r *gin.Engine) {
 	//调用路由
 	userRoute(r)
+	defaultRoute(r)
 	r.LoadHTMLGlob(filepath.Join(database.GetRootDir(), "templates/*"))
 	r.NoRoute(func(ctx *gin.Context) {
 		ctx.HTML(404, "404.html", gin.H{
