@@ -12,6 +12,13 @@ type Upload struct {
 }
 
 // 上传单文件
+func (u *Upload) Index(ctx *gin.Context) {
+	str := "i am upload[index]"
+	fmt.Println(str)
+	ctx.String(http.StatusOK, str)
+}
+
+// 上传单文件
 func (u *Upload) UploadFile(ctx *gin.Context) {
 	// 单文件
 	file, _ := ctx.FormFile("file")

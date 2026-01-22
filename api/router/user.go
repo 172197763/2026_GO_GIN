@@ -16,4 +16,5 @@ func userRoute(r *gin.Engine) {
 	def.POST("/reg", user.NewUser().Reg)
 	def.GET("/sendphonemsg", user.NewUser().SendPhoneMsg)
 	def.GET("/test", user.NewUser().Test)
+	def.GET("/index", user.NewUser().Index)
 }

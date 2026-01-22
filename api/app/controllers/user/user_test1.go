@@ -10,6 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (u *User) Index(ctx *gin.Context) {
+	str := "i am user[index]"
+	fmt.Println(str)
+	ctx.String(http.StatusOK, str)
+}
 func (u *User) Test(ctx *gin.Context) {
 	content := fmt.Sprintf("有新的门店审核待处理。门店名称:%v,门店ID:%v,用户ID:%v,时间:%v", "测试", "测试1", "测试2", time.Now().Format("2006-01-02 15:04:05"))
 	mapSafe("key1", "value1")

@@ -9,4 +9,5 @@ type IUser interface {
 	SendPhoneMsg(ctx *gin.Context)
 	Reg(ctx *gin.Context)
 	Test(ctx *gin.Context)
+	Index(ctx *gin.Context)
 }
