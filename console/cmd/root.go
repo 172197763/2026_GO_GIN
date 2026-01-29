@@ -20,5 +20,6 @@ func init() {
 	RootCmd.AddCommand(timeCmd)
 	RootCmd.AddCommand(imgCmd)
 	RootCmd.AddCommand(GenericsCmd)
+	RootCmd.AddCommand(daemonCmd)
 	RootCmd.AddCommand(leetcode.AnsCmd)
 }

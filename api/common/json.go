@@ -15,3 +15,6 @@ func JsonEncode(data any) string {
 	}
 	return string(res)
 }
+func JsonDecode(str string, data any) error {
+	return json.Unmarshal([]byte(str), data)
+}
