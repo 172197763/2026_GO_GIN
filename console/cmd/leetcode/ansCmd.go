@@ -22,6 +22,10 @@ var AnsCmd = &cobra.Command{
 			Q1126()
 		case 3637:
 			Q3637()
+		case 3640:
+			Q3640()
+		case 3379:
+			Q3379()
 
 		}
 	},
