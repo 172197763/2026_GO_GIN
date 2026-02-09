@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"gin_test/api/common"
 	"math/rand"
 	"strings"
 
@@ -20,15 +21,14 @@ var demoCmd = &cobra.Command{
 	Short: "命令行工具",
 	Long:  `略`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for i := 390000; i < 410000; i++ {
-			tmp := i
-			cj(tmp)
-		}
+		fmt.Println("2026-02-09" < "2026-02-10")
+		cj(412309)
 	},
 }
 
 // cj 根据上证指数6位数字作为seed，生成随机数，并将nameArr中的每个元素对应的随机数打印出来
 func cj(n int) {
+	common.PrintT("开始执行")
 	seed := int64(n) //取周一3点收市时，上证指数6位数字作为seed
 	nameArr := []string{"jvav攻城狮练习两年半", "摸鱼王小二", "臭咸鱼20299", "小鳄鱼crocodile", "小熊猫幺儿"}
 	randSource := rand.New(rand.NewSource(seed/int64(len(nameArr)) + seed%int64(len(nameArr))))
