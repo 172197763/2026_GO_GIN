@@ -28,7 +28,7 @@ func PrintT(msg string, items ...any) {
 		fmt.Println(newItems...)
 		log = fmt.Sprint(newItems)
 	}
-	gmqtt.MqttLogClient.Log(0, "debug_log", log)
+	go gmqtt.MqttLogClient.Log(0, "debug_log", log)
 }
 
 // 生成带时间格式日志字符串
