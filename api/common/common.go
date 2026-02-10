@@ -28,3 +28,24 @@ func RandInt(s int, e int) int {
 	num := rand.Intn(e)
 	return num - s
 }
+
+// 日期转时间戳秒
+func Date2Timestamp(dateStr string) (int64, error) {
+	// 定义日期字符串的布局格式
+	layout := "2006-01-02 15:04:05" // 这是 Go 中标准的时间布局格式
+
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		return 0, err
+	}
+
+	// 解析时间为本地时区
+	t, err := time.ParseInLocation(layout, dateStr, loc)
+	if err != nil {
+		return 0, err
+	}
+
+	// 转换为 Unix 时间戳（秒）
+	timestamp := t.Unix()
+	return timestamp, nil
+}

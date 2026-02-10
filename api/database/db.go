@@ -2,13 +2,11 @@ package database
 
 import (
 	"fmt"
-	"log"
-	"os"
+	"gin_test/config"
 	"path/filepath"
 	"runtime"
 
 	_ "github.com/go-sql-driver/mysql" // 匿名导入
-	"github.com/joho/godotenv"
 	"xorm.io/xorm"
 	xormlog "xorm.io/xorm/log"
 )
@@ -18,25 +16,13 @@ var session *xorm.Session
 
 // InitDatabase 初始化数据库连接
 func InitDatabase() error {
-	fpath := filepath.Join(GetRootDir(), ".env")
-	fmt.Println("读取", fpath)
-	// 检查文件是否存在
-	if _, err := os.Stat(fpath); os.IsNotExist(err) {
-		log.Fatal("Error: .env file does not exist at path:", fpath)
-	}
-	// 加载 .env 文件
-	err := godotenv.Load(filepath.Join(GetRootDir(), ".env"))
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	// 从环境变量读取配置
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	driver := os.Getenv("DB_DRIVER")
+	host := config.Get("mysql.host", "")
+	port := config.Get("mysql.port", 3306)
+	user := config.Get("mysql.user", "")
+	password := config.Get("mysql.password", "")
+	dbname := config.Get("mysql.dbname", "product")
+	driver := config.Get("mysql.driver", "mysql")
 
 	// 构建数据源名称
 	var dataSourceName string
@@ -46,7 +32,7 @@ func InitDatabase() error {
 	}
 
 	// 创建数据库引擎
-	engine, err = xorm.NewEngine(driver, dataSourceName)
+	engine, err := xorm.NewEngine(driver, dataSourceName)
 	if err != nil {
 		return err
 	}

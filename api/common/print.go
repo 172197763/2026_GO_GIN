@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"gin_test/components/gmqtt"
 	"regexp"
 	"runtime"
 	"strings"
@@ -14,8 +15,10 @@ func PrintT(msg string, items ...any) {
 	fullFuncName, file, line := getCurrentCaller()
 	fname := strings.Split(fullFuncName, ".")
 	prefix := fmt.Sprintf("%s %s:%d[func:%s]", timestamp, file, line, fname[len(fname)-1])
+	var log = ""
 	if hasPlaceholder(msg) && len(items) > 0 {
 		fmt.Printf(prefix+msg+"\n", items...)
+		log = fmt.Sprintf(prefix+msg, items...)
 	} else {
 		newItems := make([]interface{}, len(items)+1)
 		newItems[0] = prefix + msg
@@ -23,7 +26,9 @@ func PrintT(msg string, items ...any) {
 			copy(newItems[1:], items)
 		}
 		fmt.Println(newItems...)
+		log = fmt.Sprint(newItems)
 	}
+	gmqtt.MqttLogClient.Log(0, "debug_log", log)
 }
 
 // 生成带时间格式日志字符串

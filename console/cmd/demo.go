@@ -21,8 +21,18 @@ var demoCmd = &cobra.Command{
 	Short: "命令行工具",
 	Long:  `略`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("2026-02-09" < "2026-02-10")
-		cj(412309)
+		// fmt.Println("2026-02-09" < "2026-02-10")
+		// cj(412309)
+		// fmt.Println(config.Get("mysql.host", "127.0.0.1"))
+		// fmt.Println(config.Get("mysql.port", 3306))
+		// mq, err := gmqtt.GetMQTTClient()
+		// if err != nil {
+		// 	fmt.Println("获取MQTT客户端失败:", err)
+		// }
+		// mq.Publish("test", 0, false, "hello world")
+		common.PrintT("开始执行")
+		common.PrintT("结束执行", "参数1", 123, "参数2", "abc")
+		common.PrintT("结束执行%+v", map[string]any{"参数1": 123, "参数2": "abc"})
 	},
 }
 
