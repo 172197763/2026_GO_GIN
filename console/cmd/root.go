@@ -23,4 +23,5 @@ func init() {
 	RootCmd.AddCommand(daemonCmd)
 	RootCmd.AddCommand(leetcode.AnsCmd)
 	RootCmd.AddCommand(errorCmd)
+	RootCmd.AddCommand(interfCmd)
 }
