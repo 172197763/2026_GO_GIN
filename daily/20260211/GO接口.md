@@ -83,7 +83,7 @@ type itab struct {
     inter *interfacetype // 接口的类型信息（如 io.Reader）
     _type *_type        // 具体类型的类型信息（如 *os.File）
     hash  uint32        // 接口 + 类型的哈希值，用于快速查找
-    fun   [1]uintptr    // 方法地址数组（变长，实际大小由接口方法数决定）
+    fun   []uintptr    // 方法地址数组（变长，实际大小由接口方法数决定）
 }
 ```
 
@@ -124,20 +124,20 @@ func show(b Bird) {
 ```
 
 #### 执行流程说明：
-1. 初始化 `duck` 变量时，Go 会根据 [Duck]结构创建一个实例。
-2. 调用 [show]函数时，由于参数类型为 [Bird]，此时会生成一个 [Duck] 对应的 [Bird]接口实例。
-3. 在 [show]函数内部，会通过 `iface` 中的 `fun` 数组找到 [Eat]和 [Sound] 方法的地址并调用。
-4. 调用 `duck.Iam()` 时，仅会在 `duck` 自身中查找 [Iam]方法，而不会涉及 [Bird]接口实例。
+1. 初始化 `duck` 变量时，Go 会根据 `Duck`结构创建一个实例。
+2. 调用 `show`函数时，由于参数类型为 `Bird`，此时会生成一个 `Duck` 对应的 `Bird`接口实例。
+3. 在 `show`函数内部，会通过 `iface` 中的 `fun` 数组找到 `Eat`和 `Sound` 方法的地址并调用。
+4. 调用 `duck.Iam()` 时，仅会在 `duck` 自身中查找 `Iam()`方法，而不会经过`Bird`接口实例。
 
 ---
 
 ### ❓ 常见问题解答
 
 #### Q1：什么时候会产生 `iface` 的实例？
-只有当发生 **从具体类型 → 接口类型** 的转换时，编译器才会检查是否实现接口。
+只有当发生 **从具体类型 → 接口类型** 的转换时，编译器才会检查是否实现接口。如果不实现接口中的方法，则编译器会报错。
 
 #### Q2：为什么 `itab` 中要存储 `fun` 数组？`_type` 中不是已经有方法地址了吗？
-因为 [Duck] 还有其他方法（例如 [Iam]），所以 `iface` 中的 `fun` 数组会根据 [Bird]接口中声明的方法，动态获取 [Duck] 中对应方法的地址。
+因为 `Duck` 还有其他方法（例如 `Iam()`），所以 `iface` 中的 `fun` 数组会根据 `Bird`接口中声明的方法，动态获取 `Duck` 中对应方法的地址。
 
 ---
 
@@ -172,7 +172,7 @@ type eface struct {
 
 ### 注意事项：
 
-- 当 `_type` 为 `nil` 且 [data]也为 `nil` 时，`eface` 实例才被认为是 `nil`。
+- 当 `_type` 为 `nil` 且 `data`也为 `nil` 时，`eface` 实例才被认为是 `nil`。
 
 #### 示例代码：
 
@@ -189,3 +189,84 @@ if data == nil {
 }
 ```
 
+## ✨ 实际应用
+### 1.嵌套与组合
+示例代码：
+```go
+type Eater interface {
+    Eat()
+}
+
+type Sounder interface {
+    Sound()
+}
+
+// 组合接口
+type Animal interface {
+    Eater
+    Sounder
+}
+
+type Dog struct{}
+
+func (d *Dog) Eat() {
+    println("Dog eat")
+}
+
+func (d *Dog) Sound() {
+    println("Dog bark")
+}
+
+func main() {
+    var animal Animal = &Dog{}
+    animal.Eat()
+    animal.Sound()
+}
+```
+
+解释：
+- Animal 接口通过嵌套 Eater 和 Sounder 接口，自动获得了这两个接口的所有方法。
+- 如果一个类型实现了 Eater 和 Sounder 的所有方法，就等于实现了 Animal 接口。
+### 2.类型断言
+示例代码：
+```
+func process(i interface{}) {
+    if s, ok := i.(string); ok {
+        println("String value:", s)
+    } else if n, ok := i.(int); ok {
+        println("Int value:", n)
+    } else {
+        println("Unknown type")
+    }
+}
+
+func main() {
+    process("hello")
+    process(42)
+    process(true)
+}
+//结果
+//String value: hello
+//Int value: 42
+//Unknown type
+```
+### 3.反射
+示例代码：
+```
+import (
+    "fmt"
+    "reflect"
+)
+
+func inspect(i interface{}) {
+    t := reflect.TypeOf(i)
+    v := reflect.ValueOf(i)
+    fmt.Printf("Type: %v, Value: %v\n", t, v)
+}
+
+func main() {
+    inspect("hello")
+    inspect(42)
+    inspect([]int{1, 2, 3})
+}
+```
