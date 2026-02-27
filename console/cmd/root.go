@@ -24,4 +24,5 @@ func init() {
 	RootCmd.AddCommand(leetcode.AnsCmd)
 	RootCmd.AddCommand(errorCmd)
 	RootCmd.AddCommand(interfCmd)
+	RootCmd.AddCommand(syncCondCmd)
 }

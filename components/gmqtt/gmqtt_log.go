@@ -20,7 +20,7 @@ var MqttLogClient *mqttLogClient
 func init() {
 	MqttLogClient = &mqttLogClient{_config{
 		userArr:  []int{},
-		enable:   true,
+		enable:   false,
 		deadLine: "",
 	}}
 }
