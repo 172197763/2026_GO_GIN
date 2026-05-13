@@ -30,10 +30,31 @@ var demoCmd = &cobra.Command{
 		// 	fmt.Println("获取MQTT客户端失败:", err)
 		// }
 		// mq.Publish("test", 0, false, "hello world")
-		common.PrintT("开始执行")
-		common.PrintT("结束执行", "参数1", 123, "参数2", "abc")
-		common.PrintT("结束执行%+v", map[string]any{"参数1": 123, "参数2": "abc"})
+		// common.PrintT("开始执行")
+		// common.PrintT("结束执行", "参数1", 123, "参数2", "abc")
+		// common.PrintT("结束执行%+v", map[string]any{"参数1": 123, "参数2": "abc"})
+		t()
 	},
+}
+
+func t() {
+	channel1 := make(chan int)
+	channel2 := make(chan int)
+	go func() {
+		channel1 <- common.RandInt(100, 999)
+	}()
+	go func() {
+		channel2 <- common.RandInt(100, 999)
+	}()
+	for i := 0; i < 2; i++ {
+		select {
+		case a := <-channel1:
+			fmt.Println("channel1:", a)
+		case b := <-channel2:
+			fmt.Println("channel2:", b)
+		}
+	}
+	fmt.Println("progress end")
 }
 
 // cj 根据上证指数6位数字作为seed，生成随机数，并将nameArr中的每个元素对应的随机数打印出来
