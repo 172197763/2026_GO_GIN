@@ -2,7 +2,6 @@ package daos
 
 import (
 	"gin_test/api/app/models"
-	"gin_test/api/database"
 
 	"xorm.io/xorm"
 )
@@ -12,7 +11,8 @@ type store_supplier_dao struct {
 }
 
 func Newstore_supplier_dao() *store_supplier_dao {
-	return &store_supplier_dao{Session: database.GetDbSession()}
+	// return &store_supplier_dao{Session: database.GetDbSession()}
+	return &store_supplier_dao{}
 }
 
 // 查找列表

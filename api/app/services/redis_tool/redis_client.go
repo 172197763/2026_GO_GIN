@@ -2,8 +2,11 @@ package redis_tool
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
+
+	"gin_test/api/config"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -17,11 +20,26 @@ type RedisStreamListener struct {
 
 // NewRedisStreamListener 创建新的Redis流监听器
 func NewRedisStreamListener() *RedisStreamListener {
+	// 从配置获取Redis参数
+	host, _ := config.GetConfigString("redis.host")
+	if host == "" {
+		host = "localhost"
+	}
+	port, _ := config.GetConfigInt("redis.port")
+	if port == 0 {
+		port = 6379
+	}
+	password, _ := config.GetConfigString("redis.password")
+	db, _ := config.GetConfigInt("redis.db")
+
+	// 构建Redis地址
+	addr := fmt.Sprintf("%s:%d", host, port)
+
 	// 初始化Redis客户端
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:9002", // Redis地址
-		Password: "",               // Redis密码
-		DB:       0,                // 使用的数据库
+		Addr:     addr,     // Redis地址
+		Password: password, // Redis密码
+		DB:       db,       // 使用的数据库
 	})
 
 	ctx, cancel := context.WithCancel(context.Background())

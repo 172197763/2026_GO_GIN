@@ -1,58 +1,86 @@
 package database
 
+//初始化数据库连接
 import (
 	"fmt"
-	"gin_test/config"
-	"path/filepath"
-	"runtime"
+	"gin_test/api/config"
+	"sync"
+	"time"
 
-	_ "github.com/go-sql-driver/mysql" // 匿名导入
+	_ "github.com/go-sql-driver/mysql"
 	"xorm.io/xorm"
-	xormlog "xorm.io/xorm/log"
+	"xorm.io/xorm/log"
 )
 
-var engine *xorm.Engine
-var session *xorm.Session
+var (
+	engines   = make(map[string]*xorm.Engine)
+	enginesMu sync.RWMutex
+)
 
-// InitDatabase 初始化数据库连接
-func InitDatabase() error {
-	// 从环境变量读取配置
-	host := config.Get("mysql.host", "")
-	port := config.Get("mysql.port", 3306)
-	user := config.Get("mysql.user", "")
-	password := config.Get("mysql.password", "")
-	dbname := config.Get("mysql.dbname", "product")
-	driver := config.Get("mysql.driver", "mysql")
+// GetDb 获取指定数据库的引擎
+// @param dbName 数据库名称 例:db1.name
+// @return *xorm.Engine 数据库引擎
+func GetDb(dbName string) *xorm.Engine {
 
-	// 构建数据源名称
-	var dataSourceName string
-	if driver == "mysql" {
-		dataSourceName = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-			user, password, host, port, dbname)
+	enginesMu.RLock()
+	if engine, ok := engines[dbName]; ok {
+		enginesMu.RUnlock()
+		return engine
 	}
+	enginesMu.RUnlock()
 
-	// 创建数据库引擎
-	engine, err := xorm.NewEngine(driver, dataSourceName)
+	enginesMu.Lock()
+	defer enginesMu.Unlock()
+
+	engine, err := initDatabase(dbName)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	engine.ShowSQL(true)
-	engine.Logger().SetLevel(xormlog.LOG_DEBUG) // 已修正
-
-	// 测试连接
-	if err = engine.Ping(); err != nil {
-		return err
-	}
-	session = engine.NewSession()
-	return nil
-}
-func GetRootDir() string {
-	_, filename, _, _ := runtime.Caller(0)
-	return filepath.Join(filepath.Dir(filename), "../..")
-}
-func GetDbEngine() *xorm.Engine {
+	engines[dbName] = engine
 	return engine
 }
-func GetDbSession() *xorm.Session {
-	return session
+
+// GetDbSession 获取指定数据库的会话
+func GetDbSession(dbName string) *xorm.Session {
+	return GetDb(dbName).NewSession()
+}
+
+// initDatabase 初始化数据库连接
+func initDatabase(dbName string) (*xorm.Engine, error) {
+	user, _ := config.GetConfigString("DB.USER")
+	password, _ := config.GetConfigString("DB.PASSWORD")
+	host, _ := config.GetConfigString("DB.HOST")
+	port, _ := config.GetConfigInt("DB.PORT")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		user, password, host, port, dbName)
+	driver, _ := config.GetConfigString("DB.DRIVER")
+	engine, err := xorm.NewEngine(driver, dsn)
+	// 如果需要设置连接池的空闲数大小，可以使用 engine.SetMaxIdleConns() 来实现。
+	// 如果需要设置最大打开连接数，则可以使用 engine.SetMaxOpenConns() 来实现。
+	// 如果需要设置连接的最大生存时间，则可以使用 engine.SetConnMaxLifetime() 来实现。
+	engine.SetMaxIdleConns(10)
+	engine.SetMaxOpenConns(100)
+	engine.SetConnMaxLifetime(time.Duration(10 * 60))
+	if err != nil {
+		return nil, err
+	}
+	env, _ := config.GetConfigString("APP.ENV")
+	if env != "pro" {
+		engine.ShowSQL(true)
+		engine.Logger().SetLevel(log.LOG_DEBUG)
+	}
+
+	if err = engine.Ping(); err != nil {
+		return nil, err
+	}
+	return engine, nil
+}
+
+// CloseAll 关闭所有数据库连接
+func CloseAll() {
+	enginesMu.Lock()
+	defer enginesMu.Unlock()
+	for _, engine := range engines {
+		engine.Close()
+	}
 }

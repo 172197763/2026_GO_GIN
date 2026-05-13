@@ -2,9 +2,17 @@ package common
 
 import (
 	"math/rand"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
+
+// GetRootDir 获取项目根目录
+func GetRootDir() string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Join(filepath.Dir(filename), "../..")
+}
 
 // Descrption: 字符串切割成数组
 func SmartSplit(str string, sep string) []string {

@@ -60,6 +60,7 @@ func (u *User) rpcFun(num1 int32, num2 int32) (int32, error) {
 	resp, err := calculator.Add(ctx, &calc.AddRequest{A: num1, B: num2})
 	if err != nil {
 		log.Printf("Add failed: %v", err)
+		return 0, err
 	}
 
 	log.Printf("Result: %d", resp.GetResult())
@@ -72,6 +73,7 @@ func (u *User) SendPhoneMsg(ctx *gin.Context) {
 	resChan := make(chan string, 2)
 	// 确保 channel 最终会被关闭
 	defer close(resChan)
+	
 	go func(phone string) {
 		resChan <- userService.SendPhoneMsg("13000000001")
 	}(phone)
@@ -81,7 +83,6 @@ func (u *User) SendPhoneMsg(ctx *gin.Context) {
 	//不确保返回结果顺序
 	res1 := <-resChan
 	res2 := <-resChan
-	close(resChan)
 
 	ctx.JSON(http.StatusOK, gin.H{"data2": res1 + res2})
 }

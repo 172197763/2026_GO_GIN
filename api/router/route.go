@@ -2,7 +2,7 @@ package router
 
 import (
 	"gin_test/api/app/controllers"
-	"gin_test/api/database"
+	"gin_test/api/common"
 	"gin_test/api/router/middleware"
 	"path/filepath"
 
@@ -15,7 +15,8 @@ func Init(r *gin.Engine) {
 	r.GET("/index", middleware.Test(), controllers.Index) //全局路由+中间件 会触发log中间件
 	userRoute(r)                                          //用户路由 会触发log中间件
 
-	r.LoadHTMLGlob(filepath.Join(database.GetRootDir(), "templates/*"))
+	// r.LoadHTMLGlob(filepath.Join(database.GetRootDir(), "templates/*"))
+	r.LoadHTMLGlob(filepath.Join(common.GetRootDir(), "templates/*"))
 	r.NoRoute(func(ctx *gin.Context) {
 		ctx.HTML(404, "404.html", gin.H{
 			"title": "你迷路啦",
